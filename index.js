@@ -4,6 +4,7 @@ const process = require('node:process');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+const {log, warn, error} = console;
 const debug = process.env.NODE_ENV == 'development'
 	? console.debug
 	: () => {};
@@ -29,7 +30,7 @@ Examples:
   vs2sm my/snippets output/dir
 
 	`.trim();
-	console.log(msg);
+	log(msg);
 }
 
 async function main(args) {
@@ -69,15 +70,15 @@ async function main(args) {
 			}));
 		}
 		return await Promise.all(tasks).then(() => {
-			console.log(`Done.`);
+			log(`Done.`);
 			return 0;
 
 		}).catch(err => {
-			console.error(err);
+			error(err);
 			return 1;
 		});
 	} else {
-		console.error(`Invalid file type:`, src);
+		error(`Invalid file type:`, src);
 		return 1;
 	}
 }
