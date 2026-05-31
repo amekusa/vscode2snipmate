@@ -1,0 +1,26 @@
+{
+  "name": "vscode2snipmate",
+  "version": "0.1.0",
+  "description": "Converts VSCode snippets into SnipMate ones.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"noop\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amekusa/vscode2snipmate.git"
+  },
+  "keywords": [
+    "snippet",
+    "snippets",
+    "snipmate",
+    "vscode",
+    "convert"
+  ],
+  "author": "Satoshi Soma (github.com/amekusa)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amekusa/vscode2snipmate/issues"
+  },
+  "homepage": "https://github.com/amekusa/vscode2snipmate#readme"
+}
