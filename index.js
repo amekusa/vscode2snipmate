@@ -52,7 +52,9 @@ async function main(args) {
 	debug(`dst:`, dst);
 	debug();
 
-	let readOpts = {encoding: 'utf8', flag: 'r'};
+	let readOpts  = {encoding: 'utf8', flag: 'r'};
+	let writeOpts = {encoding: 'utf8', flag: 'w'};
+
 	let stats = await fs.stat(src);
 	if (stats.isFile()) {
 
@@ -62,11 +64,16 @@ async function main(args) {
 		for (let i = 0; i < files.length; i++) {
 			let file = files[i];
 			if (file == 'package.json') continue;
-			file = path.join(src, file);
-			debug(`src file:`, file);
+			if (!file.match(/\.json$/)) continue;
 
-			tasks.push(fs.readFile(file, readOpts).then(data => {
-				debug(`data:`, data);
+			let f = path.join(src, file);
+			debug(`src file:`, f);
+
+			tasks.push(fs.readFile(f, readOpts).then(data => {
+				data = convert(data);
+				let writeTo = path.join(dst, file.replace(/\.json$/, '.snippets'));
+				debug(`dst file:`, writeTo);
+				return fs.writeFile(writeTo, data, writeOpts);
 			}));
 		}
 		return await Promise.all(tasks).then(() => {
@@ -77,10 +84,41 @@ async function main(args) {
 			error(err);
 			return 1;
 		});
+
 	} else {
 		error(`Invalid file type:`, src);
 		return 1;
 	}
+}
+
+function convert(data) {
+	const snippets = JSON.parse(data);
+	const out = [];
+
+	for (const [name, snippet] of Object.entries(snippets)) {
+		const prefixes = Array.isArray(snippet.prefix)
+			? snippet.prefix
+			: [snippet.prefix];
+
+		const trigger = prefixes[0];
+		const aliases = prefixes.slice(1);
+
+		if (aliases.length) {
+			out.push(`# aliases: ${aliases.join(', ')}`);
+		}
+
+		out.push(`snippet ${trigger}`);
+
+		if (Array.isArray(snippet.body)) {
+			out.push(...snippet.body);
+		} else {
+			out.push(snippet.body);
+		}
+
+		out.push('');
+	}
+
+	return out.join('\n');
 }
 
 main(process.argv.slice(2)).then(process.exit);
