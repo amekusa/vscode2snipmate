@@ -92,33 +92,29 @@ async function main(args) {
 }
 
 function convert(data) {
-	const snippets = JSON.parse(data);
-	const out = [];
+	data = JSON.parse(data);
+	let r = [];
+	for (let k in data) {
+		let v = data[k];
+		if (!v.prefix || !v.body) continue;
 
-	for (const [name, snippet] of Object.entries(snippets)) {
-		const prefixes = Array.isArray(snippet.prefix)
-			? snippet.prefix
-			: [snippet.prefix];
-
-		const trigger = prefixes[0];
-		const aliases = prefixes.slice(1);
-
-		if (aliases.length) {
-			out.push(`# aliases: ${aliases.join(', ')}`);
-		}
-
-		out.push(`snippet ${trigger}`);
-
-		if (Array.isArray(snippet.body)) {
-			out.push(...snippet.body);
+		let prefixes = Array.isArray(v.prefix) ? v.prefix : [v.prefix];
+		if (prefixes.length > 1) {
+			let desc = prefixes.slice(1).join(' ');
+			r.push(`snippet ${prefixes[0]} ${desc}`);
 		} else {
-			out.push(snippet.body);
+			r.push(`snippet ${prefixes[0]}`);
 		}
 
-		out.push('');
-	}
+		if (Array.isArray(v.body)) {
+			r.push(...v.body);
+		} else {
+			r.push(v.body);
+		}
 
-	return out.join('\n');
+		r.push('');
+	}
+	return r.join('\n');
 }
 
 main(process.argv.slice(2)).then(process.exit);
