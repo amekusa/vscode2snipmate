@@ -99,17 +99,16 @@ function convert(data) {
 		if (!v.prefix || !v.body) continue;
 
 		let prefixes = Array.isArray(v.prefix) ? v.prefix : [v.prefix];
-		if (prefixes.length > 1) {
-			let desc = prefixes.slice(1).join(' ');
-			r.push(`snippet ${prefixes[0]} ${desc}`);
-		} else {
-			r.push(`snippet ${prefixes[0]}`);
-		}
+		let trigger = prefixes[0].trim().replaceAll(/\s+/g, '_');
+		if (!trigger) continue;
+		let desc = prefixes.length == 1 ? '' : prefixes.slice(1).join(', ').trim();
+		if (desc) trigger += ` ${desc}`;
+		r.push(`snippet ${trigger}`);
 
 		if (Array.isArray(v.body)) {
-			r.push(...v.body);
+			r.push(...v.body.map(each => `\t${each}`));
 		} else {
-			r.push(v.body);
+			r.push(`\t${v.body}`);
 		}
 
 		r.push('');
