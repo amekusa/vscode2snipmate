@@ -52,11 +52,26 @@ async function main(args) {
 	debug(`dst:`, dst);
 	debug();
 
+	let extJson = /\.json$/i;
 	let readOpts  = {encoding: 'utf8', flag: 'r'};
 	let writeOpts = {encoding: 'utf8', flag: 'w'};
 
 	let stats = await fs.stat(src);
 	if (stats.isFile()) {
+		return fs.readFile(src, readOpts).then(data => {
+			data = convert(data);
+			let writeTo = path.join(dst, path.basename(src).replace(extJson, '') + '.snippets');
+			debug(`dst file:`, writeTo);
+
+			return fs.writeFile(writeTo, data, writeOpts).then(() => {
+				log(`Done.`);
+				return 0;
+
+			}).catch(err => {
+				error(err);
+				return 1;
+			});
+		})
 
 	} else if (stats.isDirectory()) {
 		let tasks = [];
@@ -64,19 +79,19 @@ async function main(args) {
 		for (let i = 0; i < files.length; i++) {
 			let file = files[i];
 			if (file == 'package.json') continue;
-			if (!file.match(/\.json$/)) continue;
+			if (!file.match(extJson)) continue;
 
 			let f = path.join(src, file);
 			debug(`src file:`, f);
 
 			tasks.push(fs.readFile(f, readOpts).then(data => {
 				data = convert(data);
-				let writeTo = path.join(dst, file.replace(/\.json$/, '.snippets'));
+				let writeTo = path.join(dst, file.replace(extJson, '.snippets'));
 				debug(`dst file:`, writeTo);
 				return fs.writeFile(writeTo, data, writeOpts);
 			}));
 		}
-		return await Promise.all(tasks).then(() => {
+		return Promise.all(tasks).then(() => {
 			log(`Done.`);
 			return 0;
 
@@ -113,7 +128,8 @@ function convert(data) {
 
 		r.push('');
 	}
-	return r.join('\n');
+	return r.join('\n') + '\n';
 }
 
 main(process.argv.slice(2)).then(process.exit);
+
