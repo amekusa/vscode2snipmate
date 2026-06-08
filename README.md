@@ -1,6 +1,13 @@
 # VSCode 2 Snipmate
 Converts VSCode snippets into SnipMate ones.
 
+## Installation
+This is a CLI application. Globally install it via NPM.
+
+```sh
+npm i -g vscode2snipmate
+```
+
 ## Usage
 ```
 === VSCode 2 SnipMate ===
