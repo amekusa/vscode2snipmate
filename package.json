@@ -2,7 +2,10 @@
   "name": "vscode2snipmate",
   "version": "0.1.0",
   "description": "Converts VSCode snippets into SnipMate ones.",
-  "main": "index.js",
+  "main": "vs2sm.js",
+  "bin": {
+    "vs2sm": "vs2sm.js"
+  },
   "scripts": {
     "test": "echo \"noop\""
   },
